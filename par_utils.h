@@ -11,6 +11,7 @@
 
 #include "parallel-hashmap/parallel_hashmap/phmap.h"
 #include "parallel-hashmap/parallel_hashmap/btree.h"
+#include "SlashBurn.h"
 
 #include "pvector.h"
 #include "benchmark.h"
@@ -44,7 +45,7 @@ using set_t = SetT<uint64_t>;
 template<class K, class V>
 using HashT = MAPNAME<K, V EXTRAARGS>;
 using hash_t = HashT<uint64_t, uint64_t>;
-using map_t = HashT<uint64_t, set_t>;
+//using map_t = HashT<uint64_t, set_t>;
 
 void calc_cc_sizes(pvector<uint64_t> &comp, uint64_t n);
 

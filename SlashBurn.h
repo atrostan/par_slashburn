@@ -43,6 +43,8 @@ template<class K>
 using SetT = SETNAME<K SETEXTRAARGS>;
 using set_t = SetT<uint64_t>;
 
+using absl_set_t = absl::flat_hash_set<uint64_t>;
+
 template<class K, class V>
 using HashT = MAPNAME<K, V EXTRAARGS>;
 using hash_t = HashT<uint64_t, uint64_t>;
