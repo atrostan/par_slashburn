@@ -1,12 +1,12 @@
 //
 // Created by atrostan on 13/10/22.
 //
-#include <fmt/core.h>
-#include <fmt/ranges.h>
-
 #include <oneapi/dpl/execution>
 #include <oneapi/dpl/algorithm>
 #include <oneapi/dpl/numeric>
+
+#include <fmt/core.h>
+#include <fmt/ranges.h>
 
 #include "absl/container/flat_hash_set.h"
 #include "absl/container/flat_hash_map.h"
