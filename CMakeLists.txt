@@ -11,7 +11,6 @@ set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -pedantic -fopenmp")
 
 find_package(Boost 1.58.0 COMPONENTS system filesystem graph serialization REQUIRED)
 find_package(OpenMP REQUIRED)
-find_package(gflags REQUIRED)
 
 set(absl_DIR ./install/lib/cmake/absl)
 find_package(oneDPL REQUIRED)
