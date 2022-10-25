@@ -5,10 +5,11 @@
 #ifndef GAPBS_SB_BITMAP_H
 #define GAPBS_SB_BITMAP_H
 
-#include <algorithm>
-#include <cinttypes>
 #include <oneapi/dpl/execution>
 #include <oneapi/dpl/algorithm>
+
+#include <algorithm>
+#include <cinttypes>
 #include "platform_atomics.h"
 
 /*

@@ -5,6 +5,9 @@
 #ifndef GAPBS_SB_SLASHBURN_H
 #define GAPBS_SB_SLASHBURN_H
 
+#include <oneapi/dpl/execution>
+#include <oneapi/dpl/algorithm>
+#include <oneapi/dpl/numeric>
 
 #include "benchmark.h"
 #include <fmt/core.h>
@@ -23,9 +26,6 @@
 #include "omp.h"
 #include "ips4o/ips4o.hpp"
 #include "bitmap.h"
-#include <oneapi/dpl/execution>
-#include <oneapi/dpl/algorithm>
-#include <oneapi/dpl/numeric>
 
 #define MAPNAME phmap::parallel_flat_hash_map
 #define NMSP phmap

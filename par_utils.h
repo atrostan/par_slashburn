@@ -4,6 +4,10 @@
 #include <fmt/core.h>
 #include <fmt/ranges.h>
 
+#include <oneapi/dpl/execution>
+#include <oneapi/dpl/algorithm>
+#include <oneapi/dpl/numeric>
+
 #include "absl/container/flat_hash_set.h"
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/btree_set.h"
@@ -18,9 +22,6 @@
 #include "omp.h"
 #include "ips4o/ips4o.hpp"
 #include "bitmap.h"
-#include <oneapi/dpl/execution>
-#include <oneapi/dpl/algorithm>
-#include <oneapi/dpl/numeric>
 
 #ifndef GAPBS_SB_PAR_UTILS_H
 #define GAPBS_SB_PAR_UTILS_H
