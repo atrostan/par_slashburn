@@ -18,7 +18,7 @@ add_subdirectory(ips4o)
 add_subdirectory(parallel-hashmap)
 find_package(absl REQUIRED)
 
-set(GraphPreprocessDir "/home/atrostan/Workspace/repos/congenial-enigma/graph_preprocess")
+set(GraphPreprocessDir "../graph_preprocess")
 
 add_executable(par_slashburn main.cpp cc.cpp cc.h graph.h timer.h util.h pvector.h platform_atomics.h bitmap.h benchmark.h builder.h reader.h generator.h command_line.h writer.h utilities.cpp utilities.h par_utils.cpp par_utils.h SlashBurn.cpp SlashBurn.h ${GraphPreprocessDir}/sql.h ${GraphPreprocessDir}/sql.cpp)
 target_include_directories(par_slashburn PUBLIC ${GraphPreprocessDir})
