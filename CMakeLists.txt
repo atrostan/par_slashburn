@@ -9,7 +9,7 @@ FetchContent_Declare(fmt
 FetchContent_MakeAvailable(fmt)
 set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -pedantic -fopenmp")
 
-find_package(Boost 1.58.0 COMPONENTS system filesystem graph serialization REQUIRED)
+find_package(Boost 1.58.0 EXACT COMPONENTS system filesystem graph serialization REQUIRED)
 find_package(OpenMP REQUIRED)
 
 set(absl_DIR ./install/lib/cmake/absl)
