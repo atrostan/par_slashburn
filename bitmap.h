@@ -4,7 +4,6 @@
 
 #ifndef GAPBS_SB_BITMAP_H
 #define GAPBS_SB_BITMAP_H
-
 #include <oneapi/dpl/execution>
 #include <oneapi/dpl/algorithm>
 
