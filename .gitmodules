@@ -1,6 +1,8 @@
 [submodule "ips4o"]
 	path = ips4o
-	url = https://github.com/ips4o/ips4o.git
+	url = https://github.com/atrostan/ips4o.git
+	branch = ignore-find-tbb
+
 [submodule "parallel-hashmap"]
 	path = parallel-hashmap
 	url = git@github.com:greg7mdp/parallel-hashmap.git
