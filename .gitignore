@@ -360,5 +360,5 @@ venv/**
 
 
 # absl
-install/*
-abseil-cpp/*
+install/
+abseil-cpp/
