@@ -29,7 +29,7 @@ bool valid_perm(pvector<uint64_t> &perm) {
 #pragma omp parallel for schedule(static)
 	for (uint64_t i = 0; i < copy.size(); i++)
 		if (copy[i] != i) {
-			fmt::print("Thread {} found unassigned vertex: {}: {}\n", omp_get_thread_num(), i);
+			fmt::print("Thread {} found unassigned vertex: {}\n", omp_get_thread_num(), i);
 			all_valid[omp_get_thread_num()] = false;
 		}
 
