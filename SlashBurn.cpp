@@ -46,6 +46,7 @@ SlashBurn::SlashBurn(Graph &g, int n_neighs, float p, Bitmap &bitmap) : g(g), bm
 //		fmt::print("gcc id: {}\n", gcc_id);
 //		fmt::print("gcc size: {}\n", gcc_size);
 //		print_bitmap();
+//		fmt::print("degrees: {}\n", degrees);
 		clear();
 		n_iters++;
 	}
@@ -67,13 +68,23 @@ void SlashBurn::clear() {
 
 void SlashBurn::par_decrement() {
 	// convert to vector for parallel iteration
-	std::vector<std::pair<uint64_t, uint64_t>> v{decrements.begin(), decrements.end()};
+//	std::vector<std::pair<uint64_t, uint64_t>> v{decrements.begin(), decrements.end()};
+	pvector<std::pair<uint64_t, uint64_t>> v(decrements.size());
+
+	std::transform(
+		dpl::execution::par,
+		decrements.begin(),
+		decrements.end(),
+		v.begin(),
+		[](auto &kv){ return kv;}
+	);
+
 	uint64_t n = v.size();
 #pragma omp parallel for schedule(static)
 	for (uint64_t i = 0; i < n; i++) {
 		uint64_t vid = v[i].first;
 		uint64_t decrement = v[i].second;
-		if (degrees[vid] < decrement) {
+		if (degrees[vid] < decrement) { // todo: hacky; should be exactly 0 for last decrement
 			degrees[vid] = 0;
 		} else {
 			degrees[vid] -= decrement;
@@ -94,10 +105,18 @@ void SlashBurn::compute_decrements(pvector<uint64_t> &vertices_to_decrement) {
 			                         1);
 			++n_incident_edges;
 		}
+		for (uint64_t v: g.in_neigh(u)) {
+			decrements.try_emplace_l(v,
+			                         [](hash_t::value_type &val) { val.second += 1; },
+			                         1);
+			++n_incident_edges;
+		}
 
 		decrements[u] = n_incident_edges;
-//		fmt::print("decrements: {}\n", decrements);
+
 	}
+//	fmt::print("decrements: {}\n", decrements);
+
 
 }
 
@@ -130,7 +149,7 @@ void SlashBurn::get_final_components(map_t &comps) {
 }
 
 void SlashBurn::place_final_comp_vec(map_t &comps) {
-	std::vector<std::vector<uint64_t>> comp_vec(comps.size());
+	pvector<std::vector<uint64_t>> comp_vec(comps.size());
 	uint64_t comp_idx = 0;
 	uint64_t comp_start_idx = spokes_end;
 
@@ -142,7 +161,7 @@ void SlashBurn::place_final_comp_vec(map_t &comps) {
 			std::make_move_iterator(kv.second.begin()),
 			std::make_move_iterator(kv.second.end()));
 		// sort by ascending id within each spoke
-		std::sort(dpl::execution::par_unseq, comp_vec[comp_idx].begin(), comp_vec[comp_idx].end());
+//		std::sort(dpl::execution::par_unseq, comp_vec[comp_idx].begin(), comp_vec[comp_idx].end());
 		++comp_idx;
 		comp_start_idx -= n_vs_in_comp;
 	}
@@ -222,7 +241,7 @@ void SlashBurn::par_compute_spokes() {
 
 	// todo this step seems costly - could be done more efficiently
 	// copy into a vector of vectors and sort
-	std::vector<std::vector<uint64_t>> spokes_vec(spokes.size());
+	pvector<std::vector<uint64_t>> spokes_vec(spokes.size());
 	uint64_t spokes_idx = 0;
 	uint64_t spoke_start_idx = spokes_end;
 
@@ -234,7 +253,7 @@ void SlashBurn::par_compute_spokes() {
 			std::make_move_iterator(kv.second.begin()),
 			std::make_move_iterator(kv.second.end()));
 		// sort by ascending id within each spoke
-		std::sort(dpl::execution::par_unseq, spokes_vec[spokes_idx].begin(), spokes_vec[spokes_idx].end());
+//		std::sort(dpl::execution::par_unseq, spokes_vec[spokes_idx].begin(), spokes_vec[spokes_idx].end());
 		++spokes_idx;
 		spoke_start_idx -= n_vs_in_spoke;
 	}
@@ -245,7 +264,6 @@ void SlashBurn::par_compute_spokes() {
 		          if (s1.size() == s2.size()) { return s1[0] < s2[0]; }
 		          else { return s1.size() > s2.size(); }
 	          });
-
 	// compute a partial sum so that each spoke corresponds to an index into the final perm array
 	std::vector<uint64_t> perm_start_idcs(spokes_vec.size());
 	std::transform(
@@ -475,8 +493,7 @@ void SlashBurn::init() {
 void SlashBurn::populate_degrees() {
 #pragma omp parallel for schedule(static)
 	for (uint64_t v = 0; v < num_nodes; ++v) {
-		uint64_t d = g.out_degree(v);
-//			+ g.in_degree(v);
+		uint64_t d = g.out_degree(v) + g.in_degree(v);
 		degrees[v] = d;
 	}
 }
@@ -580,7 +597,7 @@ void SlashBurn::Afforest() {
 
 	// Sample 'comp' to find the most frequent element -- due to prior
 	// compression, this value represents the largest intermediate component
-	NodeID c = SampleFrequentElement(2048);
+	NodeID c = SampleFrequentElement(1024);
 //	c = 0;
 
 	// Final 'link' phase over remaining edges (excluding largest component)
