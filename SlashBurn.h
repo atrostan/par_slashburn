@@ -58,7 +58,6 @@ public:
 	float prec;
 
 	uint64_t num_nodes;
-	std::mt19937 gen;
 	pvector<uint64_t> degrees;
 	pvector<uint64_t> vids;
 	pvector<uint64_t> top_k;

@@ -20,8 +20,15 @@ SlashBurn::SlashBurn(Graph &g, int n_neighs, float p, Bitmap &bitmap) : g(g), bm
 	n_iters = 0;
 	while (true) {
 		sort_by_degrees();
+        // if, after sorting, the highest degree vertex is a singleton, the graph is completely fragmented, so break
+        if (degrees[vids[0]]== 0) break;
 		remove_k_hubs();
 		compute_decrements(top_k);
+        for (const auto &k: top_k) {
+            fmt::print("[{} : {}], ", k, degrees[k]);
+        }
+        fmt::print("\n");
+        fmt::print("k: {}\n", k);
 		par_decrement();
 		// compute connected components
 		Afforest();
@@ -524,6 +531,9 @@ NodeID SlashBurn::SampleFrequentElement(int64_t num_samples = 1024) {
 	// Sample elements from 'comp'
 	// need to only sample from active vertices
 	get_active_vertex_set();
+    std::mt19937 gen;
+
+    fmt::print("active_vertex_set: {}\n", active_vertex_set.size());
 	std::uniform_int_distribution<NodeID> distribution(0, active_vertex_set.size() - 1);
 	for (NodeID i = 0; i < num_samples; i++) {
 		NodeID n = active_vertex_set[distribution(gen)];
@@ -534,6 +544,7 @@ NodeID SlashBurn::SampleFrequentElement(int64_t num_samples = 1024) {
 	auto most_frequent = std::max_element(
 		sample_counts.begin(), sample_counts.end(),
 		[](const kvp_type &a, const kvp_type &b) { return a.second < b.second; });
+    fmt::print("most_frequent: {}\n", most_frequent->first);
 	float frac_of_graph = static_cast<float>(most_frequent->second) / num_samples;
 //	std::cout
 //		<< "Skipping largest intermediate component (ID: " << most_frequent->first

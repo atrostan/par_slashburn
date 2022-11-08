@@ -24,6 +24,7 @@ int main(int argc, char *argv[]) {
 		return -1;
 	Builder b(cli);
 	fmt::print("cli.out_filename(): {}\n", cli.out_filename());
+    fmt::print("omp_get_max_threads(): {}\n", omp_get_max_threads());
 	Graph g = b.MakeGraph();
 	int n_neighbour_rounds = 2;
 	float percent = cli.percent();
