@@ -29,7 +29,7 @@
 
 #define MAPNAME phmap::parallel_flat_hash_map
 #define NMSP phmap
-#define MTX std::mutex
+#define MTX absl::Mutex
 #define EXTRAARGS                                                       \
     , NMSP::priv::hash_default_hash<K>, NMSP::priv::hash_default_eq<K>, \
         std::allocator<std::pair<const K, V>>, 4, MTX

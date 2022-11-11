@@ -17,7 +17,7 @@
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/btree_set.h"
 #include "absl/container/btree_map.h"
-
+#include "absl/synchronization/mutex.h"
 #include "parallel-hashmap/parallel_hashmap/phmap.h"
 #include "parallel-hashmap/parallel_hashmap/btree.h"
 
@@ -29,7 +29,7 @@
 
 #define MAPNAME phmap::parallel_flat_hash_map
 #define NMSP phmap
-#define MTX std::mutex
+#define MTX absl::Mutex
 #define EXTRAARGS                                                       \
     , NMSP::priv::hash_default_hash<K>, NMSP::priv::hash_default_eq<K>, \
         std::allocator<std::pair<const K, V>>, 4, MTX
@@ -71,13 +71,13 @@ public:
 	uint64_t gcc_size;
 	uint64_t n_iters;
 
-
 	map_t spokes;
 	hash_t component_sizes;
 	hash_t decrements;
 	Bitmap &bmap;
 
 	pvector<uint64_t> active_vertex_set;
+    uint64_t active_vertex_set_size;
 
 	SlashBurn(Graph &g, int n_neighs, float prec, Bitmap &bitmap);
 
@@ -126,6 +126,10 @@ public:
 	void write_permutation(std::string path);
 
 	void place_final_comp_vec(map_t & comps);
+
+    bool vertex_inactive(uint64_t vid);
+
+    void get_set(pvector<uint64_t> &p, std::set<uint64_t> &s) ;
 };
 
 
