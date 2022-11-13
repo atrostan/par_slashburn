@@ -25,7 +25,6 @@ bool valid_perm(pvector<uint64_t> &perm) {
             copy.end()
     );
     std::vector<bool> all_valid(omp_get_max_threads(), true);
-//    fmt::print("perm: {}\n", perm);
 #pragma omp parallel for schedule(static)
     for (uint64_t i = 0; i < copy.size(); i++)
         if (copy[i] != i) {
@@ -50,38 +49,25 @@ int main(int argc, char *argv[]) {
     fmt::print("g.num_edges_directed(): {}\n", g.num_edges_directed());
     fmt::print("g.directed: {}\n", g.directed());
     int n_neighbour_rounds = 2;
-
     float percent = cli.percent();
-    // TODO add k as input arg
     Bitmap bmap(g.num_nodes());
     SlashBurn sb = SlashBurn(g, n_neighbour_rounds, percent, bmap);
-//    return std::all_of(all_valid.begin(), all_valid.end(), [](bool v) { return v; });
-//    fmt::print("perm: {}\n", sb.perm);
-
     pvector<uint64_t> copy(sb.perm.begin(), sb.perm.end());
-    ips4o::parallel::sort(
-            copy.begin(),
-            copy.end()
-    );
+    ips4o::parallel::sort(copy.begin(), copy.end());
     uint64_t i = 0;
     for (uint64_t n = 0; n < g.num_nodes(); ++n) {
         if (copy[i] == n) {
             ++i;
         }
-//        else {
-//            fmt::print("n is missing: {}\n", n);
-//            assert(false);
-//        }
     }
+		// check no duplicates
     assert(i == g.num_nodes());
-//    fmt::print("perm: {}\n", sb.perm);
     // check that all permutation indices have been assigned a valid index
     assert(std::all_of(
             sb.perm.begin(),
             sb.perm.end(),
             [](uint64_t idx) { return idx != 0xFFFFFFFFFFFFFFFF; }
     ));
-
     sb.write_permutation(cli.out_filename());
 
     boost::filesystem::path p(cli.filename());

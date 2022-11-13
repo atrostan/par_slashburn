@@ -77,7 +77,7 @@ public:
 	Bitmap &bmap;
 
 	pvector<uint64_t> active_vertex_set;
-    uint64_t active_vertex_set_size;
+	uint64_t active_vertex_set_size;
 
 	SlashBurn(Graph &g, int n_neighs, float prec, Bitmap &bitmap);
 
@@ -125,11 +125,11 @@ public:
 
 	void write_permutation(std::string path);
 
-	void place_final_comp_vec(map_t & comps);
+	void place_final_comp_vec(map_t &comps);
 
-    bool vertex_inactive(uint64_t vid);
+	bool vertex_inactive(uint64_t vid);
 
-    void get_set(pvector<uint64_t> &p, std::set<uint64_t> &s) ;
+	void print_progress();
 };
 
 
