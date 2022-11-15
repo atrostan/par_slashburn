@@ -118,7 +118,7 @@ void read_pr_scores_as_binary(std::string path, std::vector<double> &scores) {
 }
 
 int main(int argc, char *argv[]) {
-	CLPageRank cli(argc, argv, "pagerank", 1e-4, 20);
+	CLPageRank cli(argc, argv, "pagerank", 1e-4, 100);
 	if (!cli.ParseArgs())
 		return -1;
 	Builder b(cli);
