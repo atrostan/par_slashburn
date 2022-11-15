@@ -211,6 +211,7 @@ public:
 			case 'i':
 				num_iters_ = atoi(opt_arg);
 				break;
+
 			default:
 				CLApp::HandleArg(opt, opt_arg);
 		}
@@ -223,15 +224,17 @@ public:
 class CLPageRank : public CLApp {
 	int max_iters_;
 	double tolerance_;
+	std::string pr_output_path_; // where to persist the graph's PageRank
 
 public:
 	CLPageRank(int argc, char **argv, std::string name, double tolerance,
 	           int max_iters) :
 		CLApp(argc, argv, name), max_iters_(max_iters), tolerance_(tolerance) {
-		get_args_ += "i:t:";
+		get_args_ += "i:t:c:";
 		AddHelpLine('i', "i", "perform at most i iterations",
 		            std::to_string(max_iters_));
 		AddHelpLine('t', "t", "use tolerance t", std::to_string(tolerance_));
+		AddHelpLine('c', "c", "save the PageRank values as a binary vector to here", pr_output_path_);
 	}
 
 	void HandleArg(signed char opt, char *opt_arg) override {
@@ -242,6 +245,9 @@ public:
 			case 't':
 				tolerance_ = std::stod(opt_arg);
 				break;
+			case 'c':
+				pr_output_path_ = opt_arg;
+				break;
 			default:
 				CLApp::HandleArg(opt, opt_arg);
 		}
@@ -250,6 +256,8 @@ public:
 	int max_iters() const { return max_iters_; }
 
 	double tolerance() const { return tolerance_; }
+
+	std::string pr_output_path() const { return pr_output_path_; }
 };
 
 

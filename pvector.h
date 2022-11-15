@@ -6,7 +6,10 @@
 #define GAPBS_SB_PVECTOR_H
 
 #include <algorithm>
-
+#include <boost/archive/binary_oarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/utility.hpp>
 
 /*
 GAP Benchmark Suite
@@ -20,10 +23,10 @@ Vector class with ability to not initialize or do initialize in parallel
 */
 
 
-template <typename T_>
+template<typename T_>
 class pvector {
 public:
-	typedef T_* iterator;
+	typedef T_ *iterator;
 
 	pvector() : start_(nullptr), end_size_(nullptr), end_capacity_(nullptr) {}
 
@@ -38,9 +41,9 @@ public:
 	}
 
 	pvector(iterator copy_begin, iterator copy_end)
-			: pvector(copy_end - copy_begin) {
+		: pvector(copy_end - copy_begin) {
 #pragma omp parallel for
-		for (size_t i=0; i < capacity(); i++)
+		for (size_t i = 0; i < capacity(); i++)
 			start_[i] = copy_begin[i];
 	}
 
@@ -49,15 +52,15 @@ public:
 
 	// prefer move because too much data to copy
 	pvector(pvector &&other)
-			: start_(other.start_), end_size_(other.end_size_),
-			  end_capacity_(other.end_capacity_) {
+		: start_(other.start_), end_size_(other.end_size_),
+		  end_capacity_(other.end_capacity_) {
 		other.start_ = nullptr;
 		other.end_size_ = nullptr;
 		other.end_capacity_ = nullptr;
 	}
 
 	// want move assignment
-	pvector& operator= (pvector &&other) {
+	pvector &operator=(pvector &&other) {
 		if (this != &other) {
 			ReleaseResources();
 			start_ = other.start_;
@@ -70,7 +73,7 @@ public:
 		return *this;
 	}
 
-	void ReleaseResources(){
+	void ReleaseResources() {
 		if (start_ != nullptr) {
 			delete[] start_;
 		}
@@ -85,7 +88,7 @@ public:
 		if (num_elements > capacity()) {
 			T_ *new_range = new T_[num_elements];
 #pragma omp parallel for
-			for (size_t i=0; i < size(); i++)
+			for (size_t i = 0; i < size(); i++)
 				new_range[i] = start_[i];
 			end_size_ = new_range + size();
 			delete[] start_;
@@ -113,11 +116,11 @@ public:
 		end_size_ = start_ + num_elements;
 	}
 
-	T_& operator[](size_t n) {
+	T_ &operator[](size_t n) {
 		return start_[n];
 	}
 
-	const T_& operator[](size_t n) const {
+	const T_ &operator[](size_t n) const {
 		return start_[n];
 	}
 
@@ -132,7 +135,7 @@ public:
 
 	void fill(T_ init_val) {
 #pragma omp parallel for
-		for (T_* ptr=start_; ptr < end_size_; ptr++)
+		for (T_ *ptr = start_; ptr < end_size_; ptr++)
 			*ptr = init_val;
 	}
 
@@ -152,7 +155,7 @@ public:
 		return end_size_;
 	}
 
-	T_* data() const {
+	T_ *data() const {
 		return start_;
 	}
 
@@ -164,9 +167,16 @@ public:
 
 
 private:
-	T_* start_;
-	T_* end_size_;
-	T_* end_capacity_;
+	friend class boost::serialization::access;
+	T_ *start_;
+	T_ *end_size_;
+	T_ *end_capacity_;
 	static const size_t growth_factor = 2;
+
+	template<class Archive>
+	void serialize(Archive &ar, const unsigned int version) {
+			ar & boost::serialization::make_array(start_, size());
+	}
 };
+
 #endif //GAPBS_SB_PVECTOR_H
