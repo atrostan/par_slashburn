@@ -1,11 +1,18 @@
 cmake_minimum_required(VERSION 3.16)
 project(par_slashburn)
 set(CMAKE_CXX_STANDARD 17)
+
 include(FetchContent)
+
+Set(FETCHCONTENT_QUIET FALSE)
+
+
 FetchContent_Declare(fmt
         GIT_REPOSITORY https://github.com/fmtlib/fmt.git
         GIT_TAG master
+        GIT_PROGRESS TRUE
         )
+
 FetchContent_MakeAvailable(fmt)
 set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -pedantic -fopenmp")
 
