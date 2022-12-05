@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
     boost::filesystem::path dir = p.parent_path();
     std::string graph_name = dir.filename().string();
     std::string sqlite_db_path = cli.db_filename();
-    single_val_set_int(sqlite_db_path, "par_slashburn", "preproc", graph_name, sb.time);
-    single_val_set_int(sqlite_db_path, "par_sb_k", "statistics", graph_name, sb.k);
-    single_val_set_int(sqlite_db_path, "par_sb_n_iters", "statistics", graph_name, sb.n_iters);
+    single_val_set<uint32_t>(sqlite_db_path, "par_slashburn", "preproc", graph_name, sb.time);
+    single_val_set<uint32_t>(sqlite_db_path, "par_sb_k", "statistics", graph_name, sb.k);
+    single_val_set<uint32_t>(sqlite_db_path, "par_sb_n_iters", "statistics", graph_name, sb.n_iters);
     return 0;
 }
