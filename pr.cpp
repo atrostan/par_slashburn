@@ -38,12 +38,12 @@ implemention is still available in src/pr_spmv.cc.
 
 using namespace std;
 
-typedef double ScoreT;
+typedef float ScoreT;
 const float kDamp = 0.85;
 
 
 pvector<ScoreT> PageRankPullGS(const Graph &g, int max_iters,
-                               double epsilon = 0) {
+                               float epsilon = 0) {
 	const ScoreT init_score = 1.0f / g.num_nodes();
 	const ScoreT base_score = (1.0f - kDamp) / g.num_nodes();
 	pvector<ScoreT> scores(g.num_nodes(), init_score);
@@ -52,7 +52,7 @@ pvector<ScoreT> PageRankPullGS(const Graph &g, int max_iters,
 	for (NodeID n = 0; n < g.num_nodes(); n++)
 		outgoing_contrib[n] = init_score / g.out_degree(n);
 	for (int iter = 0; iter < max_iters; iter++) {
-		double error = 0;
+		float error = 0;
 #pragma omp parallel for reduction(+ : error) schedule(dynamic, 16384)
 		for (NodeID u = 0; u < g.num_nodes(); u++) {
 			ScoreT incoming_total = 0;
@@ -87,10 +87,10 @@ void PrintTopScores(const Graph &g, const pvector<ScoreT> &scores) {
 // Verifies by asserting a single serial iteration in push direction has
 //   error < target_error
 bool PRVerifier(const Graph &g, const pvector<ScoreT> &scores,
-                double target_error) {
+                float target_error) {
 	const ScoreT base_score = (1.0f - kDamp) / g.num_nodes();
 	pvector<ScoreT> incomming_sums(g.num_nodes(), 0);
-	double error = 0;
+	float error = 0;
 	for (NodeID u: g.vertices()) {
 		ScoreT outgoing_contrib = scores[u] / g.out_degree(u);
 		for (NodeID v: g.out_neigh(u))
@@ -105,13 +105,13 @@ bool PRVerifier(const Graph &g, const pvector<ScoreT> &scores,
 }
 
 
-void save_pr_scores_as_binary(std::string path, std::vector<double> &scores) {
+void save_pr_scores_as_binary(std::string path, std::vector<float> &scores) {
 	std::ofstream ofs(path, std::ios::binary);
 	boost::archive::binary_oarchive oa(ofs);
 	oa << scores;
 }
 
-void read_pr_scores_as_binary(std::string path, std::vector<double> &scores) {
+void read_pr_scores_as_binary(std::string path, std::vector<float> &scores) {
 	std::ifstream ifs(path, std::ios::binary);
 	boost::archive::binary_iarchive ia(ifs);
 	ia >> scores;
@@ -127,12 +127,12 @@ int main(int argc, char *argv[]) {
 	pvector<ScoreT> scores = PageRankPullGS(g, cli.max_iters(), cli.tolerance());
 	auto result = PRVerifier(g, scores, cli.tolerance());
 	assert(result);
-	std::vector<double> pr_values(scores.data(), scores.end());
+	std::vector<float> pr_values(scores.data(), scores.end());
 	fmt::print("pr_values: {}\n", pr_values);
 	save_pr_scores_as_binary(cli.pr_output_path(), pr_values);
-	std::vector<double> read_pr_values;
-	read_pr_scores_as_binary(cli.pr_output_path(), read_pr_values);
-	fmt::print("read_pr_values: {}\n", read_pr_values);
+	// std::vector<float> read_pr_values;
+	// read_pr_scores_as_binary(cli.pr_output_path(), read_pr_values);
+	// fmt::print("read_pr_values: {}\n", read_pr_values);
 	
 	return 0;
 }
