@@ -105,7 +105,8 @@ bool PRVerifier(const Graph &g, const pvector<ScoreT> &scores,
 }
 
 
-void save_pr_scores_as_binary(std::string path, std::vector<float> &scores) {
+template<typename T>
+void save_pr_scores_as_binary(std::string path, std::vector<T> &scores) {
 	std::ofstream ofs(path, std::ios::binary);
 	boost::archive::binary_oarchive oa(ofs);
 	oa << scores;
@@ -127,9 +128,12 @@ int main(int argc, char *argv[]) {
 	pvector<ScoreT> scores = PageRankPullGS(g, cli.max_iters(), cli.tolerance());
 	auto result = PRVerifier(g, scores, cli.tolerance());
 	assert(result);
-	std::vector<float> pr_values(scores.data(), scores.end());
+
+	// todo make consistent datatype of vector (double, float) for future io of binary files
+	// std::vector<float> pr_values(scores.data(), scores.end());
+	std::vector<double> pr_values(scores.data(), scores.end());
 	fmt::print("pr_values: {}\n", pr_values);
-	save_pr_scores_as_binary(cli.pr_output_path(), pr_values);
+	save_pr_scores_as_binary<double>(cli.pr_output_path(), pr_values);
 	// std::vector<float> read_pr_values;
 	// read_pr_scores_as_binary(cli.pr_output_path(), read_pr_values);
 	// fmt::print("read_pr_values: {}\n", read_pr_values);
