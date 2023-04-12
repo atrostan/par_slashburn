@@ -105,7 +105,8 @@ bool PRVerifier(const Graph &g, const pvector<ScoreT> &scores,
 }
 
 
-void save_pr_scores_as_binary(std::string path, std::vector<float> &scores) {
+template<typename T>
+void save_pr_scores_as_binary(std::string path, std::vector<T> &scores) {
 	std::ofstream ofs(path, std::ios::binary);
 	boost::archive::binary_oarchive oa(ofs);
 	oa << scores;
@@ -115,6 +116,51 @@ void read_pr_scores_as_binary(std::string path, std::vector<float> &scores) {
 	std::ifstream ifs(path, std::ios::binary);
 	boost::archive::binary_iarchive ia(ifs);
 	ia >> scores;
+}
+
+
+/**
+ * Write a vector<T> to out_path as binary
+ * First, writes the size of the vector - .size().
+ * Second, writes the vector's data - .data().
+ * @tparam T
+ * @param out_path
+ * @param v
+ */
+template<typename T>
+void write_vector_as_bin(std::string out_path, std::vector<T> &v) {
+    std::ofstream out(out_path, std::ios::binary | std::ios::out | std::ios::trunc);
+    fmt::print("Writing vector to {}\n", out_path);
+    uint64_t size = v.size();
+    out.write(reinterpret_cast<char *>(&size), sizeof(uint64_t));
+    out.write(reinterpret_cast<const char *>(v.data()), size * sizeof(T));
+    out.close();
+}
+
+/**
+ * Reads the size of a vector<T> (represented using uint64_t)
+ * Fills a dynamic T array[size] with the values read from a binary file
+ * Construts a vector<T> from the array, and returns that vector
+ * @tparam T
+ * @param in_path
+ * @return
+ */
+template<typename T>
+std::vector<T> read_vector_as_bin(std::string in_path) {
+    std::ifstream in(in_path, std::ios::binary | std::ios::in);
+    fmt::print("Reading vector from {}\n", in_path);
+
+    uint64_t size = 0;
+    in.read(reinterpret_cast<char *>(&size), sizeof(uint64_t));
+    T *arr = new T[size]();
+    in.read(reinterpret_cast<char *>(arr), size * sizeof(T));
+
+    std::vector<T> v(arr, arr + size);
+    in.close();
+
+    // deallocate before returning
+    delete[]arr;
+    return v;
 }
 
 int main(int argc, char *argv[]) {
@@ -127,9 +173,13 @@ int main(int argc, char *argv[]) {
 	pvector<ScoreT> scores = PageRankPullGS(g, cli.max_iters(), cli.tolerance());
 	auto result = PRVerifier(g, scores, cli.tolerance());
 	assert(result);
-	std::vector<float> pr_values(scores.data(), scores.end());
-	fmt::print("pr_values: {}\n", pr_values);
-	save_pr_scores_as_binary(cli.pr_output_path(), pr_values);
+
+	// todo make consistent datatype of vector (double, float) for future io of binary files
+	// std::vector<float> pr_values(scores.data(), scores.end());
+	std::vector<double> pr_values(scores.data(), scores.end());
+	// fmt::print("pr_values: {}\n", pr_values);
+	// save_pr_scores_as_binary<double>(cli.pr_output_path(), pr_values);
+	write_vector_as_bin<double>(cli.pr_output_path(), pr_values);
 	// std::vector<float> read_pr_values;
 	// read_pr_scores_as_binary(cli.pr_output_path(), read_pr_values);
 	// fmt::print("read_pr_values: {}\n", read_pr_values);

@@ -157,14 +157,16 @@ class CLApp : public CLBase {
 	int num_trials_ = 16;
 	int64_t start_vertex_ = -1;
 	bool do_verify_ = false;
+	std::string output_path_;
 
 public:
 	CLApp(int argc, char **argv, std::string name) : CLBase(argc, argv, name) {
-		get_args_ += "an:r:v";
+		get_args_ += "an:r:v:c:";
 		AddHelpLine('a', "", "output analysis of last run", "false");
 		AddHelpLine('n', "n", "perform n trials", std::to_string(num_trials_));
 		AddHelpLine('r', "node", "start from node r", "rand");
 		AddHelpLine('v', "", "verify the output of each run", "false");
+		AddHelpLine('c', "c", "write output to this file", "false");
 	}
 
 	void HandleArg(signed char opt, char *opt_arg) override {
@@ -181,6 +183,9 @@ public:
 			case 'v':
 				do_verify_ = true;
 				break;
+			case 'c':
+				output_path_ = opt_arg;
+				break;
 			default:
 				CLBase::HandleArg(opt, opt_arg);
 		}
@@ -193,6 +198,7 @@ public:
 	int64_t start_vertex() const { return start_vertex_; }
 
 	bool do_verify() const { return do_verify_; }
+	std::string output_path() const { return output_path_; }
 };
 
 
