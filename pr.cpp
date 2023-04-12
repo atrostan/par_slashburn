@@ -177,7 +177,7 @@ int main(int argc, char *argv[]) {
 	// todo make consistent datatype of vector (double, float) for future io of binary files
 	// std::vector<float> pr_values(scores.data(), scores.end());
 	std::vector<double> pr_values(scores.data(), scores.end());
-	fmt::print("pr_values: {}\n", pr_values);
+	// fmt::print("pr_values: {}\n", pr_values);
 	// save_pr_scores_as_binary<double>(cli.pr_output_path(), pr_values);
 	write_vector_as_bin<double>(cli.pr_output_path(), pr_values);
 	// std::vector<float> read_pr_values;
